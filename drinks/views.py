@@ -25,5 +25,16 @@ def get_drinks(request):
 @api_view(['GET', 'PUT', 'DELETE'])    
 def drink_info(request, pk):
     drink = Drink.objects.get(pk=pk)
-    serializer = DrinkSerializer(drink)
-    return Response(serializer.data, status.HTTP_200_OK)
+    if request.method == 'GET':
+        serializer = DrinkSerializer(drink)
+        return Response(serializer.data, status.HTTP_200_OK)
+    
+    elif request.method == 'PUT':
+        serializer = DrinkSerializer(drink, data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    elif request.method == 'DELETE':
+        drink.delete()
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
